@@ -1,9 +1,15 @@
 #include "graphics.h"
 
 #include <stdio.h>
+#include <math.h>
 
 #define WIN_WIDTH 1200
 #define WIN_HEIGHT 720
+
+#define BB_SIZE 10
+
+const unsigned fg_rgb[3] = {0xff, 0xff, 0xff};
+const unsigned bg_rgb[3] = {0x00, 0x00, 0x00};
 
 bool
 init_window_ctx(window_ctx_t *win_ctx){
@@ -52,7 +58,7 @@ init_window_ctx(window_ctx_t *win_ctx){
 }
 
 void
-cleanup_window_ctx(window_ctx_t *win_ctx){
+cleanup_window_ctx(const window_ctx_t *win_ctx){
 	if(win_ctx->cr_surface) cairo_surface_destroy(win_ctx->cr_surface);
 	if(win_ctx->cr) cairo_destroy(win_ctx->cr);
 	if(win_ctx->sdl_surface) SDL_FreeSurface(win_ctx->sdl_surface);
@@ -61,26 +67,18 @@ cleanup_window_ctx(window_ctx_t *win_ctx){
 	SDL_Quit();
 }
 
-int
-main(int argc, char **argv){
-	bool running;
-	window_ctx_t win_ctx;
+void
+present_window(const window_ctx_t *win_ctx){
 	SDL_Texture *texture;
-	SDL_Event e;
 
-	init_window_ctx(&win_ctx);
-	cairo_set_source_rgb(win_ctx.cr, 0xFF, 0xFF, 0xFF);
-	cairo_rectangle(win_ctx.cr, 20, 20, 50, 50);
-	cairo_fill(win_ctx.cr);
-	cairo_surface_flush(win_ctx.cr_surface);
-	texture = SDL_CreateTextureFromSurface(win_ctx.renderer, win_ctx.sdl_surface);
-	SDL_RenderCopy(win_ctx.renderer, texture, NULL, NULL);
-	SDL_RenderPresent(win_ctx.renderer);
+	cairo_surface_flush(win_ctx->cr_surface);
+	texture = SDL_CreateTextureFromSurface(win_ctx->renderer, win_ctx->sdl_surface);
+	SDL_RenderCopy(win_ctx->renderer, texture, NULL, NULL);
+	SDL_RenderPresent(win_ctx->renderer);
+}
 
-	running = true;
-	while(running){
-		while(SDL_PollEvent(&e)) if(e.type == SDL_QUIT) running = false;
-	}
-	cleanup_window_ctx(&win_ctx);
-	return 0;
+void
+clear_window(const window_ctx_t *win_ctx){
+	cairo_set_source_rgb(win_ctx->cr, bg_rgb[0], bg_rgb[1], bg_rgb[2]);
+	cairo_paint(win_ctx->cr);
 }

@@ -6,7 +6,7 @@
 
 #include <stdbool.h>
 
-typedef struct{
+typedef struct window_ctx_t{
 	SDL_Window            *win;
 	SDL_Renderer          *renderer;
 	SDL_Surface           *sdl_surface;
@@ -14,10 +14,9 @@ typedef struct{
 	cairo_t               *cr;
 } window_ctx_t;
 
-bool
-init_window_ctx(window_ctx_t *);
-
-void
-cleanup_window(window_ctx_t *);
+bool init_window_ctx(window_ctx_t *);
+void cleanup_window_ctx(const window_ctx_t *);
+void present_window(const window_ctx_t *);
+void clear_window(const window_ctx_t *);
 
 #endif
