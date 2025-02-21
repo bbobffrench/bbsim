@@ -1,81 +1,57 @@
 #include "bb.h"
 
-#include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
+#include <math.h>
 
-#define BB_ACCEL 1
-#define BB_MAX_VELOCITY 0.5
-#define BB_ANGULAR_VELOCITY M_PI
+#define PI 3.14159
 
 void
-add_command(command_list_t **list, enum command cmd, float arg){
-	command_list_t *new, *cur;
+bb_init(buffalo_byte_t *bb){
+	bb->motor_l = bb->motor_r = 0;
+	bb->speed = 0;
+	bb->theta = 0;
+	return;
+}
 
-	new = malloc(sizeof(command_list_t));
-	new->next = NULL;
-	new->cmd = cmd;
-	new->arg = arg;
-	if(!*list) *list = new;
+void
+bb_update(buffalo_byte_t *bb, double delta_t){
+	double delta_theta, delta_speed;
+
+	bb->speed_prev = bb->speed;
+	if(!bb->motor_l && !bb->motor_r){
+		delta_speed = BB_DECCEL * pow(delta_t, 2);
+		if(bb->speed - delta_speed < 0) bb->speed = 0;
+		else bb->speed -= delta_speed;
+	}
 	else{
-		for(cur = *list; cur->next != NULL; cur = cur->next);
-		cur->next = new;
+		delta_speed = BB_ACCEL * pow(delta_t, 2);
+		if(bb->speed + delta_speed > BB_MAX_SPEED) bb->speed = BB_MAX_SPEED;
+		else bb->speed += delta_speed;
 	}
-}
 
-bool
-pop_command(command_list_t **list){
-	command_list_t *next;
-
-	if(!*list) return 0;
-	next = (*list)->next;
-	free(*list);
-	*list = next;
-	return 1;
-}
-
-void
-free_command_list(command_list_t **list){
-	while(pop_command(list));
-	*list = NULL;
-}
-
-bool
-load_command_list(command_list_t **list, char *filepath){
-	FILE *fp;
-	char cmd_str[16];
-	enum command cmd;
-	float arg;
-
-	fp = fopen(filepath, "r");
-	if(!fp){
-		fprintf(stderr, "ERR: Failed to open %s, file does not exist\n", filepath);
-		return 0;
-	}
-	while(fscanf(fp, "%s", cmd_str) != EOF){
-		if(!strcmp(cmd_str, "FORWARD")) cmd = FORWARD;
-		else if(!strcmp(cmd_str, "BACK")) cmd = BACK;
-		else if(!strcmp(cmd_str, "ROTATE")) cmd = ROTATE;
+	if(bb->motor_l && bb->motor_r){
+		delta_theta = (PI + PI * (double)rand() / RAND_MAX) * delta_t;
+		if(bb->theta < bb->theta_prev){
+			bb->theta_prev = bb->theta;
+			bb->theta += (rand() % 4 ? delta_theta : -delta_theta);
+		}
 		else{
-			fprintf(stderr, "ERR: Command %s is not valid\n", cmd_str);
-			fclose(fp);
-			return false;
+			bb->theta_prev = bb->theta;
+			bb->theta += (rand() % 4 ? -delta_theta : delta_theta);
 		}
-		if(fscanf(fp, "%f\n", &arg) == EOF){
-			fprintf(stderr, "ERR: No argument provided to %s command\n", cmd_str);
-			fclose(fp);
-			return false;
-		}
-		add_command(list, cmd, arg);
 	}
-	fclose(fp);
-	return true;
-}
+	else if(!bb->motor_l && bb->motor_r){
+		bb->theta_prev = bb->theta;
+		bb->theta -= PI * delta_t;
+	}
+	else if(bb->motor_l && !bb->motor_r){
+		bb->theta_prev = bb->theta;
+		bb->theta += PI * delta_t;
+	}
+	else bb->theta_prev = bb->theta;
 
-void
-init_bb(buffalo_byte_t *bb, float x, float y){
-	bb->x = x;
-	bb->y = y;
-	bb->velocity = bb->accel = 0;
+	bb->x += bb->speed * delta_t * sin(bb->theta);
+	bb->y += bb->speed * delta_t * cos(bb->theta);
+	return;
 }

@@ -5,12 +5,8 @@
 
 int
 main(int argc, char **argv){
-	command_list_t *list;
+	buffalo_byte_t bb;
 
-	load_command_list(&list, "list.txt");
-	for(; list != NULL; list = list->next){
-		printf("cmd: %d, arg: %f\n", list->cmd, list->arg);
-	}
-	free_command_list(&list);
+	bb_init(&bb);
 	return 0;
 }

@@ -1,27 +1,18 @@
 #ifndef BUFFALO_BYTE_H
 #define BUFFALO_BYTE_H
 
-#include <stdbool.h>
-
-enum command{FORWARD, BACK, ROTATE};
-
-typedef struct command_list{
-	struct command_list *next;
-	enum command cmd;
-	float arg;
-} command_list_t;
+#define BB_MAX_SPEED 0.25
+#define BB_ACCEL 0.1
+#define BB_DECCEL 0.1
 
 typedef struct buffalo_byte{
-	float x, y;
-	float velocity;
-	int accel;
+	char motor_l, motor_r;
+	double x, y;
+	double speed, speed_prev;
+	double theta, theta_prev; /* With respect to y-axis */
 } buffalo_byte_t;
 
-void add_command(command_list_t **, enum command, float);
-bool pop_command(command_list_t **);
-void free_command_list(command_list_t **);
-bool load_command_list(command_list_t **, char *);
-
-void init_bb(buffalo_byte_t *, float, float);
+void bb_init(buffalo_byte_t *bb);
+void bb_update(buffalo_byte_t *bb, double);
 
 #endif

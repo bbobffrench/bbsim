@@ -1,6 +1,6 @@
 CC      := gcc
-CFLAGS  := -std=c99 -Wall -pedantic -Iinclude -O3
-LDFLAGS := -lSDL2 -lcairo
+CFLAGS  := -std=c99 -Wall -pedantic -Iinclude
+LDFLAGS := -lm -lSDL2 -lcairo
 
 .PHONY: clean
 
