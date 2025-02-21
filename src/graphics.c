@@ -11,7 +11,7 @@
 const unsigned fg_rgb[3] = {0xff, 0xff, 0xff};
 const unsigned bg_rgb[3] = {0x00, 0x00, 0x00};
 
-bool
+char
 init_window_ctx(window_ctx_t *win_ctx){
 	win_ctx->win = NULL;
 	win_ctx->renderer = NULL;
@@ -30,12 +30,12 @@ init_window_ctx(window_ctx_t *win_ctx){
 	);
 	if(!win_ctx->win){
 		fprintf(stderr, "ERR: Failed to create SDL window, SDL_Error: %s\n", SDL_GetError());
-		return false;
+		return 0;
 	}
 	win_ctx->renderer = SDL_CreateRenderer(win_ctx->win, -1, SDL_RENDERER_ACCELERATED);
 	if(!win_ctx->renderer){
 		fprintf(stderr, "ERR: Failed to create SDL renderer, SDL_Error: %s\n", SDL_GetError());
-		return false;
+		return 0;
 	}
 	win_ctx->sdl_surface = SDL_CreateRGBSurface(
 		0,
@@ -54,7 +54,7 @@ init_window_ctx(window_ctx_t *win_ctx){
 		win_ctx->sdl_surface->pitch
 	);
 	win_ctx->cr = cairo_create(win_ctx->cr_surface);
-	return true;
+	return 1;
 }
 
 void
