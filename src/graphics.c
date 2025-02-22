@@ -6,7 +6,13 @@
 #define WIN_WIDTH 1200
 #define WIN_HEIGHT 720
 
-#define BB_SIZE 10
+/* For translating BB coordinates to Cairo coordinates */
+#define PX_OFFSET_X WIN_WIDTH / 2
+#define PX_OFFSET_Y WIN_HEIGHT / 2
+#define PX_SCALE 50
+
+/* Size of the BB graphical representation */
+#define BB_WIDTH 10
 
 const unsigned fg_rgb[3] = {0xff, 0xff, 0xff};
 const unsigned bg_rgb[3] = {0x00, 0x00, 0x00};
@@ -81,4 +87,20 @@ void
 clear_window(const window_ctx_t *win_ctx){
 	cairo_set_source_rgb(win_ctx->cr, bg_rgb[0], bg_rgb[1], bg_rgb[2]);
 	cairo_paint(win_ctx->cr);
+}
+
+void
+draw_bb(const window_ctx_t *win_ctx, const buffalo_byte_t *bb, char clear){
+	double x_transl = (PX_OFFSET_X + (bb->x * PX_SCALE)) + BB_WIDTH / 2;
+	double y_transl = (PX_OFFSET_Y + (bb->y * PX_SCALE)) + BB_WIDTH / 2;
+	const unsigned *color = clear ? bg_rgb : fg_rgb;
+
+	cairo_save(win_ctx->cr);
+	cairo_set_source_rgb(win_ctx->cr, color[0], color[1], color[2]);
+	cairo_translate(win_ctx->cr, x_transl, y_transl);
+	cairo_rotate(win_ctx->cr, bb->theta);
+	cairo_rectangle(win_ctx->cr, 0, 0, BB_WIDTH, BB_WIDTH);
+	cairo_fill(win_ctx->cr);
+	cairo_restore(win_ctx->cr);
+	return;
 }
