@@ -14,9 +14,6 @@
 /* Size of the BB graphical representation */
 #define BB_WIDTH 25
 
-const unsigned fg_rgb[3] = {0xff, 0xff, 0xff};
-const unsigned bg_rgb[3] = {0x00, 0x00, 0x00};
-
 char
 init_window_ctx(window_ctx_t *win_ctx){
 	win_ctx->win = NULL;
@@ -86,6 +83,8 @@ present_window(const window_ctx_t *win_ctx){
 
 void
 clear_window(const window_ctx_t *win_ctx){
+	const unsigned bg_rgb[3] = {0xff, 0xff, 0xff};
+
 	cairo_set_source_rgb(win_ctx->cr, bg_rgb[0], bg_rgb[1], bg_rgb[2]);
 	cairo_paint(win_ctx->cr);
 }
@@ -96,11 +95,61 @@ draw_bb(const window_ctx_t *win_ctx, const buffalo_byte_t *bb){
 	double y_transl = (PX_OFFSET_Y + (-bb->y * PX_SCALE)) + BB_WIDTH / 2;
 
 	cairo_save(win_ctx->cr);
-	cairo_set_source_rgb(win_ctx->cr, fg_rgb[0], fg_rgb[1], fg_rgb[2]);
+	cairo_set_source_rgb(win_ctx->cr, 0x00, 0x00, 0x00);
 	cairo_translate(win_ctx->cr, x_transl, y_transl);
 	cairo_rotate(win_ctx->cr, bb->angle * M_PI / 180);
 	cairo_rectangle(win_ctx->cr, 0, 0, BB_WIDTH, BB_WIDTH);
 	cairo_fill(win_ctx->cr);
 	cairo_restore(win_ctx->cr);
+	return;
+}
+
+void
+draw_grid(const window_ctx_t *win_ctx, int spacing){
+	unsigned pos;
+
+	cairo_set_source_rgb(win_ctx->cr, 0x00, 0x00, 0x00);
+	cairo_set_line_width(win_ctx->cr, 1);
+	cairo_set_dash(win_ctx->cr, (double[]){1, 5}, 2, 0);
+	for(pos = spacing; pos <= WIN_WIDTH; pos += spacing){
+		cairo_move_to(win_ctx->cr, pos, 0);
+		cairo_line_to(win_ctx->cr, pos, WIN_HEIGHT);
+		cairo_stroke(win_ctx->cr);
+	}
+	for(pos = spacing; pos <= WIN_HEIGHT; pos += spacing){
+		cairo_move_to(win_ctx->cr, 0, pos);
+		cairo_line_to(win_ctx->cr, WIN_WIDTH, pos);
+		cairo_stroke(win_ctx->cr);
+	}
+	return;
+}
+
+void
+draw_bb_stats(const window_ctx_t *win_ctx, const buffalo_byte_t *bb){
+	char str1[256], str2[256];
+	unsigned margin = 10, sep = 5, width, height;
+	cairo_text_extents_t extents;
+
+	cairo_select_font_face(
+		win_ctx->cr,
+		"monospace",
+		CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL
+	);
+	cairo_set_font_size(win_ctx->cr, 12);
+
+	sprintf(str1, "pos: (%f, %f); velocity: %f m/s at %f deg", bb->x, bb->y, bb->speed, bb->angle);
+	sprintf(str2, "x accel: %f m/s^2; y accel: %f m/s^2", imu_accel_x(bb), imu_accel_y(bb));
+	cairo_text_extents(win_ctx->cr, str1, &extents);
+	width = extents.width + margin * 2;
+	height = extents.height * 2 + margin * 2 + sep;
+
+	cairo_set_source_rgb(win_ctx->cr, 0xff, 0xff, 0xff);
+	cairo_rectangle(win_ctx->cr, 0, 0, width, height);
+	cairo_fill(win_ctx->cr);
+	cairo_set_source_rgb(win_ctx->cr, 0x00, 0x00, 0x00);
+	cairo_move_to(win_ctx->cr, margin, 2 * margin);
+	cairo_show_text(win_ctx->cr, str1);
+	cairo_move_to(win_ctx->cr, margin, 2 * margin + extents.height + sep);
+	cairo_show_text(win_ctx->cr, str2);
 	return;
 }

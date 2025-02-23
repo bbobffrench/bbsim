@@ -7,7 +7,7 @@ static char
 event_loop(window_ctx_t *win_ctx, buffalo_byte_t *bb){
 	SDL_Event e;
 	static char straight;
-	static double ref_angle = 0;
+	static double ref_angle;
 
 	SDL_Delay((double)1 / FPS * 1000);
 	while(SDL_PollEvent(&e)){
@@ -54,8 +54,10 @@ event_loop(window_ctx_t *win_ctx, buffalo_byte_t *bb){
 		}
 	}
 	clear_window(win_ctx);
-	bb_update(bb, (double)1 / FPS);
+	draw_grid(win_ctx, 50);
+	bb_update(bb);
 	draw_bb(win_ctx, bb);
+	draw_bb_stats(win_ctx, bb);
 	present_window(win_ctx);
 	return 1;
 }
@@ -70,8 +72,7 @@ main(int argc, char **argv){
 		fprintf(stderr, "ERR: Failed to initialize window context\n");
 		return 1;
 	}
-	bb_init(&bb);
-	clear_window(&win_ctx);
+	bb_init(&bb, (double)1 / FPS);
 	while(event_loop(&win_ctx, &bb));
 	cleanup_window_ctx(&win_ctx);
 	return 0;

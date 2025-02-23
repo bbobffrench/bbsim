@@ -19,5 +19,7 @@ void cleanup_window_ctx(const window_ctx_t *);
 void present_window(const window_ctx_t *);
 void clear_window(const window_ctx_t *);
 void draw_bb(const window_ctx_t *, const buffalo_byte_t *);
+void draw_grid(const window_ctx_t *, int);
+void draw_bb_stats(const window_ctx_t *, const buffalo_byte_t *);
 
 #endif
