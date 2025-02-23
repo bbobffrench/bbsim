@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#define BB_ACCEL 10
+#define BB_ACCEL 50
 #define BB_MAX_SPEED 0.2
 #define BB_OMEGA 100
 
