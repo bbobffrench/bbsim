@@ -9,16 +9,17 @@
 #define BB_OMEGA 100
 
 void
-bb_init(buffalo_byte_t *bb){
+bb_init(buffalo_byte_t *bb, double timestep){
 	bb->motor_l = bb->motor_r = 0;
 	bb->speed = bb->speed_prev = 0;
 	bb->angle = bb->angle_prev = 0;
+	bb->timestep = timestep;
 	return;
 }
 
 void
-bb_update(buffalo_byte_t *bb, double delta_t){
-	double delta_speed = BB_ACCEL * pow(delta_t, 2);
+bb_update(buffalo_byte_t *bb){
+	double delta_speed = BB_ACCEL * pow(bb->timestep, 2);
 
 	bb->speed_prev = bb->speed;
 	if(!bb->motor_l && !bb->motor_r){
@@ -31,33 +32,33 @@ bb_update(buffalo_byte_t *bb, double delta_t){
 	}
 
 	bb->angle_prev = bb->angle;
-	if(bb->motor_l && bb->motor_r) bb->angle += BB_OMEGA * delta_t;
+	if(bb->motor_l && bb->motor_r) bb->angle += BB_OMEGA * bb->timestep;
 	else if(!bb->motor_l && bb->motor_r){
-		bb->angle -= BB_OMEGA * delta_t;
+		bb->angle -= BB_OMEGA * bb->timestep;
 		if(bb->angle < -360) bb->angle += 360;
 	}
 	else if(bb->motor_l && !bb->motor_r){
-		bb->angle += BB_OMEGA * delta_t;
+		bb->angle += BB_OMEGA * bb->timestep;
 		if(bb->angle > 360) bb->angle -= 360;
 	}
 
-	bb->x += bb->speed * delta_t * sin(bb->angle * M_PI / 180);
-	bb->y += bb->speed * delta_t * cos(bb->angle * M_PI / 180);
+	bb->x += bb->speed * bb->timestep * sin(bb->angle * M_PI / 180);
+	bb->y += bb->speed * bb->timestep * cos(bb->angle * M_PI / 180);
 	return;
 }
 
 double
-imu_accel_x(buffalo_byte_t *bb, double delta_t){
+imu_accel_x(const buffalo_byte_t *bb){
 	double velocity_x = bb->speed * sin(bb->angle * M_PI / 180);
 	double velocity_x_prev = bb->speed_prev * sin(bb->angle_prev * M_PI / 180);
 
-	return (velocity_x - velocity_x_prev) / delta_t;
+	return (velocity_x - velocity_x_prev) / bb->timestep;
 }
 
 double
-imu_accel_y(buffalo_byte_t *bb, double delta_t){
+imu_accel_y(const buffalo_byte_t *bb){
 	double velocity_y = bb->speed * cos(bb->angle * M_PI / 180);
 	double velocity_y_prev = bb->speed_prev * cos(bb->angle_prev * M_PI / 180);
 
-	return (velocity_y - velocity_y_prev) / delta_t;
+	return (velocity_y - velocity_y_prev) / bb->timestep;
 }

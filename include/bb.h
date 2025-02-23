@@ -8,11 +8,12 @@ typedef struct buffalo_byte{
 	double x, y;
 	double speed, speed_prev;
 	double angle, angle_prev;
+	double timestep;
 } buffalo_byte_t;
 
-void bb_init(buffalo_byte_t *bb);
-void bb_update(buffalo_byte_t *bb, double);
-double imu_accel_x(buffalo_byte_t *bb, double);
-double imu_accel_y(buffalo_byte_t *bb, double);
+void bb_init(buffalo_byte_t *, double);
+void bb_update(buffalo_byte_t *);
+double imu_accel_x(const buffalo_byte_t *);
+double imu_accel_y(const buffalo_byte_t *);
 
 #endif
