@@ -1,8 +1,6 @@
 #ifndef BUFFALO_BYTE_H
 #define BUFFALO_BYTE_H
 
-enum axis{X_AXIS, Y_AXIS};
-
 typedef struct buffalo_byte{
 	char motor_l, motor_r;
 	double x, y;
