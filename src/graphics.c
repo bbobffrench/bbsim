@@ -81,6 +81,7 @@ present_window(const window_ctx_t *win_ctx){
 	texture = SDL_CreateTextureFromSurface(win_ctx->renderer, win_ctx->sdl_surface);
 	SDL_RenderCopy(win_ctx->renderer, texture, NULL, NULL);
 	SDL_RenderPresent(win_ctx->renderer);
+	SDL_DestroyTexture(texture);
 }
 
 void
