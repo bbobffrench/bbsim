@@ -32,8 +32,14 @@ bb_update(buffalo_byte_t *bb, double delta_t){
 
 	bb->angle_prev = bb->angle;
 	if(bb->motor_l && bb->motor_r) bb->angle += BB_OMEGA * delta_t;
-	else if(!bb->motor_l && bb->motor_r) bb->angle -= BB_OMEGA * delta_t;
-	else if(bb->motor_l && !bb->motor_r) bb->angle += BB_OMEGA * delta_t;
+	else if(!bb->motor_l && bb->motor_r){
+		bb->angle -= BB_OMEGA * delta_t;
+		if(bb->angle < -360) bb->angle += 360;
+	}
+	else if(bb->motor_l && !bb->motor_r){
+		bb->angle += BB_OMEGA * delta_t;
+		if(bb->angle > 360) bb->angle -= 360;
+	}
 
 	bb->x += bb->speed * delta_t * sin(bb->angle * M_PI / 180);
 	bb->y += bb->speed * delta_t * cos(bb->angle * M_PI / 180);
