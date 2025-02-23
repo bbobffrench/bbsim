@@ -45,3 +45,19 @@ bb_update(buffalo_byte_t *bb, double delta_t){
 	bb->y += bb->speed * delta_t * cos(bb->angle * M_PI / 180);
 	return;
 }
+
+double
+imu_accel_x(buffalo_byte_t *bb, double delta_t){
+	double velocity_x = bb->speed * sin(bb->angle * M_PI / 180);
+	double velocity_x_prev = bb->speed_prev * sin(bb->angle_prev * M_PI / 180);
+
+	return (velocity_x - velocity_x_prev) / delta_t;
+}
+
+double
+imu_accel_y(buffalo_byte_t *bb, double delta_t){
+	double velocity_y = bb->speed * cos(bb->angle * M_PI / 180);
+	double velocity_y_prev = bb->speed_prev * cos(bb->angle_prev * M_PI / 180);
+
+	return (velocity_y - velocity_y_prev) / delta_t;
+}
