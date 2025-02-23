@@ -97,7 +97,7 @@ draw_bb(const window_ctx_t *win_ctx, const buffalo_byte_t *bb){
 	cairo_save(win_ctx->cr);
 	cairo_set_source_rgb(win_ctx->cr, fg_rgb[0], fg_rgb[1], fg_rgb[2]);
 	cairo_translate(win_ctx->cr, x_transl, y_transl);
-	cairo_rotate(win_ctx->cr, bb->theta);
+	cairo_rotate(win_ctx->cr, bb->angle * M_PI / 180);
 	cairo_rectangle(win_ctx->cr, 0, 0, BB_WIDTH, BB_WIDTH);
 	cairo_fill(win_ctx->cr);
 	cairo_restore(win_ctx->cr);
