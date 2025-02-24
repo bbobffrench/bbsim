@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#define BB_ACCEL 50
+#define BB_ACCEL 0.5
 #define BB_MAX_SPEED 0.2
 #define BB_OMEGA 100
 
@@ -19,7 +19,7 @@ bb_init(buffalo_byte_t *bb, double timestep){
 
 void
 bb_update(buffalo_byte_t *bb){
-	double delta_speed = BB_ACCEL * pow(bb->timestep, 2);
+	double delta_speed = BB_ACCEL * bb->timestep;
 
 	bb->speed_prev = bb->speed;
 	if(!bb->motor_l && !bb->motor_r){
