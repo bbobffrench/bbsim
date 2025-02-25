@@ -110,8 +110,6 @@ plt.ioff()  # Disable interactive mode
 plt.show()
 
 
-# In[ ]:
-
 
 
 
