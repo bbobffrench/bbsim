@@ -1,0 +1,3 @@
+# Ignore directories containing binary files
+bin
+build
