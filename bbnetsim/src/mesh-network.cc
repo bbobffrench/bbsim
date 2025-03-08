@@ -8,14 +8,15 @@
 
 using namespace ns3;
 
+// Initialize all static member variables
 WifiHelper MeshNode::s_wifi;
 YansWifiPhyHelper MeshNode::s_phy;
 YansWifiChannelHelper MeshNode::s_channel;
 WifiMacHelper MeshNode::s_mac;
-
 uint8_t MeshNode::s_ttl;
 int MeshNode::s_packetSize;
-uint16_t MeshNode::s_curIndex = 0;
+uint16_t MeshNode::s_nodeIndex;
+uint16_t MeshNode::s_packetIndex;
 
 void
 MeshNode::InitNetworkParams(int ttl, int packetSize){
@@ -40,7 +41,7 @@ MeshNode::InitNetworkParams(int ttl, int packetSize){
 
 MeshNode::MeshNode(){
 	// Assign a unique node index
-	m_index = s_curIndex++;
+	m_index = s_nodeIndex++;
 
 	// Create the node and install the Wi-Fi device on it
 	m_node.Create(1);
@@ -76,16 +77,22 @@ MeshNode::SetVelocity(double velocityX, double velocityY){
 }
 
 void
-MeshNode::SendPacket(uint16_t destIndex, uint8_t ttl, uint16_t sourceIndex, uint16_t packetIndex){
+MeshNode::SendPacket(uint16_t destIndex, uint8_t ttl, uint16_t packetIndex){
+	// Ensure that packet size is large enough to embed packet metadata
+	std::size_t minPacketSize = sizeof(uint8_t) + 2 * sizeof(uint16_t);
+	if(s_packetSize < sizeof(uint8_t) + 3 * sizeof(uint16_t)){
+		std::cerr << "ERR: Packet size must be increased to at least " << minPacketSize;
+		std::cerr << " bytes" << std::endl;
+		return;
+	}
+
 	// Create data buffer storing source and destination index, TTL, and packet index
 	uint8_t data[s_packetSize];
 	data[0] = destIndex >> 8;
-	data[1] = destIndex - data[0] << 8;
+	data[1] = destIndex;
 	data[2] = ttl;
-	data[3] = sourceIndex >> 8;
-	data[4] = sourceIndex - data[3] << 8;
-	data[5] = packetIndex >> 8;
-	data[6] = packetIndex - data[5] << 8;
+	data[3] = packetIndex >> 8;
+	data[4] = packetIndex;
 	
 	// Create and send a socket holding the data buffer
 	Ptr<Packet> packet = Create<Packet>(
@@ -97,7 +104,7 @@ MeshNode::SendPacket(uint16_t destIndex, uint8_t ttl, uint16_t sourceIndex, uint
 
 void
 MeshNode::SendPacket(uint16_t destIndex){
-	SendPacket(destIndex, s_ttl, m_index, m_packetIndex++);
+	SendPacket(destIndex, s_ttl, s_packetIndex++);
 }
 
 void
@@ -108,17 +115,29 @@ MeshNode::ReceivePacket(Ptr<Socket> socket){
 	packet->CopyData(data, s_packetSize);
 	uint16_t destIndex = (data[0] << 8) + data[1];
 	uint8_t ttl = data[2];
-	uint16_t sourceIndex = data[3] << 8 + data[4];
-	uint16_t packetIndex = data[5] << 8 + data[6];
+	uint16_t packetIndex = data[4] << 8 + data[5];
 
-	// Store identifying packet information if this is the destination node
-	if(destIndex == m_index){
-		std::cout << "Packet received on node " << m_index;
-		std::cout << " from node " << sourceIndex << std::endl;
-		m_receivedPackets.push_back(std::make_tuple(sourceIndex, packetIndex));
-		return;
+	// Store packet index in the received packet list
+	if(destIndex == m_index)
+		m_receivedPackets.push_back(packetIndex);
+
+	// Otherwise forward the packet until TTL goes down to 0
+	else if(ttl > 0) SendPacket(destIndex, ttl - 1, packetIndex);
+}
+
+int
+MeshNode::GetReceivedPackets(){
+	// Count the total number of unique received packets
+	bool alreadyReceived[s_packetIndex] = {false};
+	int totalUnique;
+	for(uint16_t curIndex : m_receivedPackets){
+		if(!alreadyReceived[curIndex]) totalUnique++;
+		alreadyReceived[curIndex] = true;
 	}
+	return totalUnique;
+}
 
-	// Forward the packet until TTL goes down to 0
-	if(ttl > 0) SendPacket(destIndex, ttl - 1, sourceIndex, packetIndex);
+int
+MeshNode::GetDuplicatePackets(){
+	return m_receivedPackets.size() - GetReceivedPackets();
 }
