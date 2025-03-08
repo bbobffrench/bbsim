@@ -13,8 +13,9 @@ class MeshNode{
 public:
 	static void InitNetworkParams(int ttl, int packetSize);
 
-	void SendPacket(uint16_t destIndex);
 	MeshNode();
+	void SetVelocity(double velocityX, double velocityY);
+	void SendPacket(uint16_t destIndex);
 private:
 	// Default TTL and packet size values for all packets in the network
 	static uint8_t s_ttl;

@@ -51,9 +51,6 @@ MeshNode::MeshNode(){
 	mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel");
 	mobility.Install(m_node.Get(0));
 
-	// Set the initial position to the origin
-	m_node.Get(0)->GetObject<MobilityModel>()->SetPosition(Vector(0, 0, 0));
-
 	// Configure MAC broadcast address
 	PacketSocketAddress broadcastAddr;
 	broadcastAddr.SetSingleDevice(m_dev.Get(0)->GetIfIndex());
@@ -69,6 +66,13 @@ MeshNode::MeshNode(){
 	);
 	m_socket->Bind(broadcastAddr);
 	m_socket->SetRecvCallback(MakeCallback(&MeshNode::ReceivePacket, this));
+}
+
+void
+MeshNode::SetVelocity(double velocityX, double velocityY){
+	Ptr<ConstantVelocityMobilityModel> mobilityModel =
+		m_node.Get(0)->GetObject<ConstantVelocityMobilityModel>();
+	mobilityModel->SetVelocity(Vector(velocityX, velocityY, 0));
 }
 
 void
