@@ -5,9 +5,12 @@
 
 class BuffaloByte{
 public:
+	enum MovementState{STOPPED, LEFT_TURN, RIGHT_TURN, BB_LEFT, BB_RIGHT};
+
 	void Update();
 	double GetAccelX();
 	double GetAccelY();
+	void SetMovementState(enum MovementState);
 private:
 	const double TIMESTEP = 1.0 / 100;    // Run simulation at 100Hz
 	const double ACCEL = 0.8;             // 0.8 meters per s^2
@@ -18,9 +21,9 @@ private:
 	double m_x;
 	double m_y;
 
-	// State for each motor, either forward or off
-	bool m_motorL;
-	bool m_motorR;
+	// Movement state and reference angle (for bang-bang correction)
+	enum MovementState m_movementState;
+	double m_refAngle;
 
 	// Current speed, and angle
 	double m_speed;
