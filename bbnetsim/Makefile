@@ -5,7 +5,7 @@ LDFLAGS  := -L$(NS3_LIB_DIR) -lns3-dev-core-default -lns3-dev-network-default  \
 			-lns3-dev-mobility-default
 
 TARGET   := bbsim
-OBJS     := main.o mesh-network.o imu-data.o
+OBJS     := main.o mesh-network.o buffalo-byte.o
 
 .PHONY: check_env check_dirs all clean
 
@@ -24,7 +24,7 @@ build/mesh-network.o: src/mesh-network.cc include/mesh-network.h
 	@echo Building $@...
 	@$(CXX) $(CXXFLAGS) -g -c $< -o $@
 
-build/imu-data.o: src/imu-data.cc include/imu-data.h include/mesh-network.h
+build/buffalo-byte.o: src/buffalo-byte.cc include/buffalo-byte.h include/mesh-network.h
 	@echo Building $@...
 	@$(CXX) $(CXXFLAGS) -g -c $< -o $@
 

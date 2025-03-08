@@ -1,5 +1,5 @@
-#ifndef IMU_DATA_H
-#define IMU_DATA_H
+#ifndef BUFFALO_BYTE_H
+#define BUFFALO_BYTE_H
 
 #include "mesh-network.h"
 
