@@ -1,52 +1,48 @@
 #ifndef MESH_NETWORK_H
 #define MESH_NETWORK_H
 
-#include <cstdint>
-#include <list>
-
 #include <ns3/core-module.h>
-#include <ns3/network-module.h>
 #include <ns3/wifi-module.h>
 
-class MeshNode{
+#include <vector>
+#include <list>
+#include <tuple>
+
+class MeshNetwork{
 public:
-	static void InitNetworkParams(int ttl, int packetSize);
-
-	MeshNode();
-	void SetVelocity(double velocityX, double velocityY);
-	void SendPacket(uint16_t destIndex);
+	MeshNetwork(int numNodes, int ttl, int blacklistLen);
+	void SetVelocity(uint16_t index, double xSpeed, double ySpeed);
+	void SendPacket(uint16_t sourceIndex);
+	std::vector<std::tuple<double, double>> GetNodePositions();
+	int GetSentPackets();
 	int GetReceivedPackets();
-	int GetDuplicatePackets();
 private:
-	// Default TTL and packet size values for all packets in the network
-	static uint8_t s_ttl;
-	static int s_packetSize;
+ 	void ReceivePacket(ns3::Ptr<NetDevice>, ns3::Ptr<const ns3::Packet>);
+	void ForwardPacket(uint16_t index, uint16_t sourceIndex, uint16_t seq, uint16_t ttl);
 
-	// Used for assigning a unique index to each node
-	static uint16_t s_nodeIndex;
+	const int PAYLOAD_SIZE = 5;
+	const int PACKET_INTERVAL = 5;
 
-	// The current packet index, incremented after every packet sent (i.e. not forwarded)
-	static uint16_t s_packetIndex; 
+	int m_numNodes;
+	int m_ttl;
 
-	// Helpers to be installed all nodes in the network
-	static ns3::WifiHelper s_wifi;
-	static ns3::YansWifiPhyHelper s_phy;
-	static ns3::YansWifiChannelHelper s_channel;
-	static ns3::WifiMacHelper s_mac;
+	ns3::NodeContainer m_childNodes;
+	ns3::NodeContainer m_mainNode;
+	ns3::NetDeviceContainer m_mainNodeDevice;
+	ns3::NetDeviceContainer m_childDevices;
 
-	// Unique node index, used for identifying packet destination
-	uint16_t m_index;
+	// For tracking/updating sequence numbers for each node
+	std::vector<uint8_t> m_sentSeqs;
 
-	// ns-3 node, device, and socket
-	ns3::NodeContainer m_node;
-	ns3::NetDeviceContainer m_dev;
-	ns3::Ptr<ns3::Socket> m_socket;
+	// Total number of packets sent by child nodes to the main node
+	int m_sentPackets;
 
-	// Store a list of received packet indices
-	std::list<uint16_t> m_receivedPackets;
+	// A list of (sequence number, source index) pairs for each node, that should not be forwarded
+	int m_blacklistLen;
+	std::vector<std::list<std::tuple<uint16_t, uint16_t>>> m_blacklists;
 
-	void SendPacket(uint16_t destIndex, uint8_t ttl, uint16_t packetIndex);
-	void ReceivePacket(ns3::Ptr<ns3::Socket> socket);
+	// A list of all (sequence number, source index) pairs that have been received by the main node
+	std::list<std::tuple<uint16_t, uint16_t>> m_receivedPackets; 
 };
 
 #endif
