@@ -116,7 +116,7 @@ MovementCSV(int seconds){
 
 		// Step the movement simulation, writing results to CSV
 		bb.Update();
-		csv << bb.GetAccelX() << "," << bb.GetAccelY() << ",";
+		csv << bb.GetAccelX() << "," << bb.GetAccelY() << "," << bb.GetAngle() << ",";
 		csv << bb.GetPosX() << "," << bb.GetPosY() << std::endl;
 	}
 
