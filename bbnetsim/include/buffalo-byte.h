@@ -5,36 +5,34 @@
 
 class BuffaloByte{
 public:
-	enum MovementState{STOPPED, LEFT_TURN, RIGHT_TURN, BB_LEFT, BB_RIGHT};
+	const double TIMESTEP = 0.001; // Update in 1ms increments
 
+	enum MovementState{LEFT, RIGHT};
+
+	BuffaloByte();
 	void Update();
+	void SetMovementState(enum MovementState);
 	double GetAccelX();
 	double GetAccelY();
-	void SetMovementState(enum MovementState);
+	double GetPosX();
+	double GetPosY();
+	double GetAngle();
 private:
-	const double TIMESTEP = 1.0 / 100;    // Run simulation at 100Hz
-	const double ACCEL = 0.8;             // 0.8 meters per s^2
-	const double MAX_SPEED = 0.2;         // 0.2 meters per s
-	const double ANGULAR_VELOCITY = 100;  // 10 degrees per s
+	const double SPEED = 0.2;
+	const double ANGULAR_VELOCITY = 90;
+
+	enum MovementState m_movementState;
 
 	// Real position in meters
 	double m_x;
 	double m_y;
 
-	// Movement state and reference angle (for bang-bang correction)
-	enum MovementState m_movementState;
-	double m_refAngle;
-
-	// Current speed, and angle
-	double m_speed;
+	// Direction of the velocity vector
 	double m_angle;
 
-	// Simulated IMU acceleration data
+	// X and Y components of the acceleration vector
 	double m_accelX;
 	double m_accelY;
-
-	// Local node in the mesh network
-	MeshNode m_node;
 };
 
 #endif
