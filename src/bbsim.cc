@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <vector>
 #include <random>
-#include <iostream>
+#include <fstream>
 
 using namespace ns3;
 
@@ -94,4 +94,32 @@ RunSimulation(
 	int sent = mesh.SentPackets();
 	int received = mesh.ReceivedPackets();
 	return (double)(sent - received) / sent * 100;
+}
+
+void
+MovementCSV(int seconds){
+	// Instantiate a Buffalo Byte
+	BuffaloByte bb;
+
+	// Create a CSV file for writing
+	std::ofstream csv("data.csv");
+
+	// Run simulation, storing results in a CSV
+	double changeMovementStateTimer = 0;
+	for(double time = 0; time <= seconds; time += BuffaloByte::TIMESTEP){
+		// Update the timer, randomly changing movement state if necessary
+		if(changeMovementStateTimer == 1){
+			changeMovementStateTimer = 0;
+			bb.SetMovementState((BuffaloByte::MovementState)(std::rand() % 2));
+		}
+		else changeMovementStateTimer += BuffaloByte::TIMESTEP;
+
+		// Step the movement simulation, writing results to CSV
+		bb.Update();
+		csv << bb.GetAccelX() << "," << bb.GetAccelY() << ",";
+		csv << bb.GetPosX() << "," << bb.GetPosY() << std::endl;
+	}
+
+	// Close the CSV file
+	csv.close();
 }

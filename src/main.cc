@@ -79,16 +79,21 @@ main(int argc, char **argv){
 	// Seed the random number generator
 	std::srand(time(nullptr));
 
-	// Run the simulation, and print the resulting packet loss
-	double packetLoss = RunSimulation(
-		params[RUNTIME],
-		params[NUM_NODES],
-		params[TTL],
-		params[BLACKLIST_LENGTH],
-		params[PACKET_INTERVAL],
-		animate
-	);
-	std::cout << packetLoss << std::endl;
-
+	// Run the appropriate simulation
+	if(genCSV){
+		MovementCSV(params[RUNTIME]);
+		std::cout << "Simulation finished, saved to data.csv" << std::endl;
+	}
+	else{
+		double packetLoss = RunSimulation(
+			params[RUNTIME],
+			params[NUM_NODES],
+			params[TTL],
+			params[BLACKLIST_LENGTH],
+			params[PACKET_INTERVAL],
+			animate
+		);
+		std::cout << packetLoss << std::endl;
+	}
 	return 0;
 }

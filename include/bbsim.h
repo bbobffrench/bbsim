@@ -13,4 +13,6 @@ double RunSimulation(
 	bool animate        // Plot results with NetAnim if true
 );
 
+void MovementCSV(int seconds);
+
 #endif
