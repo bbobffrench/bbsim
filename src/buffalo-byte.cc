@@ -5,6 +5,7 @@
 
 BuffaloByte::BuffaloByte(){
 	m_x = m_y = m_angle = 0;
+	m_movementState = RIGHT;
 }
 
 void
@@ -38,6 +39,12 @@ BuffaloByte::Update(){
 void
 BuffaloByte::SetMovementState(enum BuffaloByte::MovementState movementState){
 	m_movementState = movementState;
+}
+
+void
+BuffaloByte::SetInitialPosition(std::tuple<double, double> pos){
+	m_x = std::get<0>(pos);
+	m_y = std::get<1>(pos);
 }
 
 double

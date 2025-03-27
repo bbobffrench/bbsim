@@ -3,22 +3,25 @@
 
 #include "mesh-network.h"
 
+#include <tuple>
+
 class BuffaloByte{
 public:
-	const double TIMESTEP = 0.001; // Update in 1ms increments
+	static constexpr double TIMESTEP = 0.001; // Update in 1ms increments
 
 	enum MovementState{LEFT, RIGHT};
 
 	BuffaloByte();
 	void Update();
 	void SetMovementState(enum MovementState);
+	void SetInitialPosition(std::tuple<double, double> pos);
 	double GetAccelX();
 	double GetAccelY();
 	double GetPosX();
 	double GetPosY();
 	double GetAngle();
 private:
-	const double SPEED = 0.2;
+	const double SPEED = 0.5;
 	const double ANGULAR_VELOCITY = 90;
 
 	enum MovementState m_movementState;

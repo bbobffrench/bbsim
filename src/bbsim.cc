@@ -4,6 +4,7 @@
 
 #include <cstdlib>
 #include <vector>
+#include <random>
 #include <iostream>
 
 using namespace ns3;
@@ -75,12 +76,11 @@ RunSimulation(
 	Simulator::Schedule(Seconds(0), StepMovement, &mesh, &bb);
 	Simulator::Schedule(Seconds(0), UpdateMovementStates, &bb);
 
-	// Start sending packets
+	// Schedule initial packets to be sent
+	std::uniform_real_distribution<double> randomSendTime(0, packetInterval);
+	std::default_random_engine re;
 	for(int i = 0; i < numNodes; i++)
-		Simulator::Schedule(
-			Seconds(std::rand() % packetInterval),
-			SendPacket, &mesh, i, packetInterval
-		);
+		Simulator::Schedule(Seconds(randomSendTime(re)), SendPacket, &mesh, i, packetInterval);
 
 	// Tell the simulation when to end
 	Simulator::Stop(Seconds(seconds));

@@ -14,8 +14,9 @@ public:
 	void SendPacket(uint16_t sourceIndex);
 	void SetPosition(uint16_t index, double x, double y);
 	std::vector<std::tuple<double, double>> GetNodePositions();
-	int GetSentPackets();
-	int GetReceivedPackets();
+	double NodeCount();
+	int SentPackets();
+	int ReceivedPackets();
 private:
  	void ReceivePacket(ns3::Ptr<NetDevice>, ns3::Ptr<const ns3::Packet>);
 	void ForwardPacket(uint16_t index, uint16_t sourceIndex, uint16_t seq, uint16_t ttl);

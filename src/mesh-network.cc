@@ -57,7 +57,7 @@ MeshNetwork::MeshNetwork(int numNodes, int ttl, int blacklistLen){
 	channel.SetPropagationDelay("ns3::ConstantSpeedPropagationDelayModel");
 	channel.AddPropagationLoss(
 		"ns3::LogDistancePropagationLossModel",
-		"Exponent", DoubleValue(2), // Assume ideal conditions with minimal obstructions
+		"Exponent", DoubleValue(4),
 		"ReferenceLoss", DoubleValue(40) // Set reference loss for 2.4Ghz at 1m distance
 	);
 
@@ -67,7 +67,7 @@ MeshNetwork::MeshNetwork(int numNodes, int ttl, int blacklistLen){
 	phy.Set("TxPowerEnd", DoubleValue(20));
 	phy.Set("TxGain", DoubleValue(1.5));
 	phy.Set("RxGain", DoubleValue(1.5));
-	phy.Set("EnergyDetectionThreshold", DoubleValue(-91));
+	phy.Set("RxSensitivity", DoubleValue(-91));
 	phy.SetChannel(channel.Create());
 
 	// Configure the Wi-Fi MAC layer in ad-hoc mode
@@ -181,13 +181,18 @@ MeshNetwork::GetNodePositions(){
 	return positions;
 }
 
+double
+MeshNetwork::NodeCount(){
+	return m_numNodes;
+}
+
 int
-MeshNetwork::GetSentPackets(){
+MeshNetwork::SentPackets(){
 	return m_sentPackets;
 }
 
 int
-MeshNetwork::GetReceivedPackets(){
+MeshNetwork::ReceivedPackets(){
 	// Remove duplicate packets
 	m_receivedPackets.sort();
 	m_receivedPackets.unique();
