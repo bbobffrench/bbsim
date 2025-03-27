@@ -27,7 +27,7 @@ MeshNetwork::MeshNetwork(int numNodes, int ttl, int blacklistLen){
 
 	// Use the constant velocity model for child nodes
 	MobilityHelper mobility;
-	mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel");
+	mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
 
 	// Choose range of distances
 	auto distanceRange = CreateObject<UniformRandomVariable>();
@@ -92,12 +92,6 @@ MeshNetwork::MeshNetwork(int numNodes, int ttl, int blacklistLen){
 	m_mainNodeDevice.Get(0)->SetReceiveCallback(callback);
 	for(int i = 0; i < numNodes; i++)
 		m_childDevices.Get(i)->SetReceiveCallback(callback);
-}
-
-void
-MeshNetwork::SetVelocity(uint16_t index, double xSpeed, double ySpeed){
-	auto mobilityModel = m_childNodes.Get(index)->GetObject<ConstantVelocityMobilityModel>();
-	mobilityModel->SetVelocity(Vector(xSpeed, ySpeed, 0));
 }
 
 void 
@@ -171,6 +165,12 @@ MeshNetwork::ReceivePacket(Ptr<NetDevice> device, Ptr<const Packet> packet){
 	else m_receivedPackets.insert(m_receivedPackets.begin(), pair);
 }
 
+void
+MeshNetwork::SetPosition(uint16_t index, double x, double y){
+	auto mobilityModel = m_childNodes.Get(index)->GetObject<ConstantPositionMobilityModel>();
+	mobilityModel->SetPosition(Vector(x, y, 0));
+}
+
 std::vector<std::tuple<double, double>>
 MeshNetwork::GetNodePositions(){
 	std::vector<std::tuple<double, double>> positions(m_numNodes);
@@ -192,9 +192,4 @@ MeshNetwork::GetReceivedPackets(){
 	m_receivedPackets.sort();
 	m_receivedPackets.unique();
 	return m_receivedPackets.size();
-}
-
-int
-main(int argc, char **argv){
-	return 0;
 }

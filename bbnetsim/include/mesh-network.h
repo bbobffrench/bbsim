@@ -11,8 +11,8 @@
 class MeshNetwork{
 public:
 	MeshNetwork(int numNodes, int ttl, int blacklistLen);
-	void SetVelocity(uint16_t index, double xSpeed, double ySpeed);
 	void SendPacket(uint16_t sourceIndex);
+	void SetPosition(uint16_t index, double x, double y);
 	std::vector<std::tuple<double, double>> GetNodePositions();
 	int GetSentPackets();
 	int GetReceivedPackets();
