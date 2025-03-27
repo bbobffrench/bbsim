@@ -50,7 +50,14 @@ SendPacket(MeshNetwork *mesh, int index, int interval){
 }
 
 double
-RunSimulation(int seconds, int numNodes, uint16_t ttl, int blacklistLen, int packetInterval){
+RunSimulation(
+	int seconds,
+	int numNodes,
+	uint16_t ttl,
+	int blacklistLen,
+	int packetInterval,
+	bool animate
+){
 	// Create buffalo bytes
 	std::vector<BuffaloByte> bb(numNodes);
 
@@ -59,6 +66,10 @@ RunSimulation(int seconds, int numNodes, uint16_t ttl, int blacklistLen, int pac
 
 	// Copy initial mesh node positions to their corresponding BB
 	PopulatePositions(mesh, bb);
+
+	// Create the animation interface if needed
+	AnimationInterface *anim;
+	if(animate) anim = new AnimationInterface("anim.xml");
 
 	// Start movement simulation
 	Simulator::Schedule(Seconds(0), StepMovement, &mesh, &bb);
@@ -76,6 +87,9 @@ RunSimulation(int seconds, int numNodes, uint16_t ttl, int blacklistLen, int pac
 
 	// Start the simulation
 	Simulator::Run();
+
+	// Free the animation interface if needed
+	if(animate) delete anim;
 
 	int sent = mesh.SentPackets();
 	int received = mesh.ReceivedPackets();
