@@ -1,8 +1,7 @@
 CXX      := g++
 CXXFLAGS := -std=c++20 -I$(NS3_INCLUDE_DIR) -I./include
-LDFLAGS  := -L$(NS3_LIB_DIR) -lns3-dev-core-default -lns3-dev-network-default  \
-            -lns3-dev-wifi-default -lns3-dev-propagation-default               \
-			-lns3-dev-mobility-default -lns3-dev-netanim-default
+LDFLAGS  := -L$(NS3_LIB_DIR) -lns3-dev-core-default -lns3-dev-network-default           \
+            -lns3-dev-wifi-default -lns3-dev-mobility-default -lns3-dev-netanim-default \
 
 TARGET   := bbsim
 OBJS     := mesh-network.o buffalo-byte.o bbsim.o main.o
