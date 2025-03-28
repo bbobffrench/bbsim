@@ -1,21 +1,20 @@
 #!/bin/bash
-# Usage: ./run_sims.sh [output CSV] [output PNG] [# of nodes]
+# Usage: ./run_sims.sh [# of nodes] [output PNG]
 
-output_csv=$1
-output_png=$2
-node_count=$3
+node_count=$1
+output_file=$2
 
 # Clear the output file
-> $output_csv
+> $output_file
 
 for blacklist_len in 0 1 5 20
 	do
 	echo "Running simulations with forwarding blacklist length $blacklist_len..."
-	for ttl in $(seq 0 $((node_count / 2)))
+	for ttl in {0..20}
 	do
-		echo "	Running simulation $((ttl + 1))/$((node_count / 2 + 1))..."
+		echo "	Running simulation $ttl/20..."
 		packet_loss=$(bin/bbsim -t 10 -n $node_count -ttl $ttl -bl $blacklist_len -p 5)
-		echo "$blacklist_len $ttl $packet_loss" >> $output_csv
+		echo "$blacklist_len $ttl $packet_loss" >> $output_file
 	done
 done
 
@@ -33,14 +32,14 @@ do
 	fi
 
 	# Add data to be plotted
-	plot_data+=$'\n'$(grep "^$blacklist_len " $output_csv)
+	plot_data+=$'\n'$(grep "^$blacklist_len " $output_file)
 	plot_data+=$'\n'"e"
 done
 
 # Run gnuplot
 gnuplot << EOF
 set term pngcairo
-set output "$output_png"
+set output "$output_file"
 set title "Packet loss vs. TTL for $node_count nodes"
 set xlabel "TTL"
 set ylabel "Packet loss (%)"

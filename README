@@ -12,6 +12,6 @@ bin/bbsim -t -n -ttl -p [-anim] [-csv]
 	-[anim]      Generate a NetAnim animation XML
 	-[csv]       Perform a single-BB movement simulation
 
-./run_sims.sh <CSV output file> <gnuplot output PNG> <number of nodes>
+./run_sims.sh <number of nodes> <gnuplot output PNG>
 
 Simulation results from ./run_sims.sh can be found in results/
