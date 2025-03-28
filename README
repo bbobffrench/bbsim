@@ -1,0 +1,17 @@
+bbsim - Buffalo Byte Mesh Network Simulator
+
+This simulator contains two components, one which simulates the Buffalo Byte
+mesh network and movement (bin/bbsim), and the other which performs simulations
+for a range of parameters, and plots the resuts with gnuplot (./run_sims.sh).
+
+bin/bbsim -t -n -ttl -p [-anim] [-csv]
+	-t   <value> Simulation runtime in seconds
+	-n   <value> Number of nodes in the network
+	-ttl <value> Time to leave (TTL) for all packets sent
+	-p   <value> The interval at which packets are sent in seconds
+	-[anim]      Generate a NetAnim animation XML
+	-[csv]       Perform a single-BB movement simulation
+
+./run_sims.sh <CSV output file> <gnuplot output PNG> <number of nodes>
+
+Simulation results from ./run_sims.sh can be found in results/
