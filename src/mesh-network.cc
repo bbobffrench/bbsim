@@ -17,11 +17,11 @@ MeshNetwork::MeshNetwork(int numNodes, int ttl, int blacklistLen){
 	m_mainNode.Create(1);
 	m_childNodes.Create(numNodes);
 
-	// Position the main node at the origin
+	// Position the main node at a central location
 	MobilityHelper constMobility;
 	constMobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
 	auto constPosAlloc = Create<ListPositionAllocator>();
-	constPosAlloc->Add(Vector(0, 0, 0));
+	constPosAlloc->Add(Vector(numNodes * 5, numNodes * 5, 0));
 	constMobility.SetPositionAllocator(constPosAlloc);
 	constMobility.Install(m_mainNode);
 
@@ -29,22 +29,15 @@ MeshNetwork::MeshNetwork(int numNodes, int ttl, int blacklistLen){
 	MobilityHelper mobility;
 	mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
 
-	// Choose range of distances
-	auto distanceRange = CreateObject<UniformRandomVariable>();
-	distanceRange->SetAttribute("Min", DoubleValue(0));
-	distanceRange->SetAttribute("Max", DoubleValue(5 * numNodes));
-
-	// Choose range of angles
-	auto angleRange = CreateObject<UniformRandomVariable>();
-	angleRange->SetAttribute("Min", DoubleValue(0));
-	angleRange->SetAttribute("Max", DoubleValue(360));
+	// Choose range of values for X and Y coordinates
+	auto range = CreateObject<UniformRandomVariable>();
+	range->SetAttribute("Min", DoubleValue(0));
+	range->SetAttribute("Max", DoubleValue(10 * numNodes));
 
 	// Randomly place child nodes across assigned range
-	auto randomPosAlloc = Create<RandomDiscPositionAllocator>();
-	randomPosAlloc->SetRho(distanceRange);
-	randomPosAlloc->SetTheta(angleRange);
-	randomPosAlloc->SetX(0);
-	randomPosAlloc->SetY(0);
+	auto randomPosAlloc = Create<RandomRectanglePositionAllocator>();
+	randomPosAlloc->SetX(range);
+	randomPosAlloc->SetY(range);
 	mobility.SetPositionAllocator(randomPosAlloc);
 	mobility.Install(m_childNodes);
 
@@ -57,7 +50,7 @@ MeshNetwork::MeshNetwork(int numNodes, int ttl, int blacklistLen){
 	channel.SetPropagationDelay("ns3::ConstantSpeedPropagationDelayModel");
 	channel.AddPropagationLoss(
 		"ns3::LogDistancePropagationLossModel",
-		"Exponent", DoubleValue(4),
+		"Exponent", DoubleValue(3),
 		"ReferenceLoss", DoubleValue(40) // Set reference loss for 2.4Ghz at 1m distance
 	);
 
